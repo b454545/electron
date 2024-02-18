@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: VerteDinde <vertedinde@electronjs.org>
-Date: Sat, 17 Feb 2024 20:23:01 -0800
+Date: Sat, 17 Feb 2024 21:29:36 -0800
 Subject: fix: revert "src,lb: reducing C++ calls of esm legacy main resolve"
 
 This switch to native legacyMainResolve doesn't take asar into account, and can
@@ -336,3 +336,43 @@ index 6f1b55284db0f4f8c70081b4834a074c717f3cc9..a969fff32bd156aa9393c1db9eec474e
    void MemoryInfo(MemoryTracker* tracker) const override;
    SET_SELF_SIZE(BindingData)
    SET_MEMORY_INFO_NAME(BindingData)
+diff --git a/test/es-module/test-cjs-legacyMainResolve.js b/test/es-module/test-cjs-legacyMainResolve.js
+index 1dc7d8faafe6eb5cea7e43e9783041f2a994be0d..d86d501689b2b72f2b964d6e2a91c5d36b6b62f5 100644
+--- a/test/es-module/test-cjs-legacyMainResolve.js
++++ b/test/es-module/test-cjs-legacyMainResolve.js
+@@ -82,7 +82,7 @@ describe('legacyMainResolve', () => {
+           {},
+           ''
+         ),
+-      { message: /instance of URL/, code: 'ERR_INVALID_ARG_TYPE' },
++      { message: 'Invalid URL', code: 'ERR_INVALID_URL' },
+     );
+   });
+ 
+@@ -129,7 +129,7 @@ describe('legacyMainResolve', () => {
+     );
+     assert.throws(
+       () => legacyMainResolve(packageJsonUrl, { main: null }, packageJsonUrl),
+-      { code: 'ERR_MODULE_NOT_FOUND' },
++      { code: 'ERR_INTERNAL_ASSERTION' },
+     );
+   });
+ 
+@@ -137,7 +137,7 @@ describe('legacyMainResolve', () => {
+     const packageJsonUrl = pathToFileURL('/c/file%20with%20percents/package.json');
+     assert.throws(
+       () => legacyMainResolve(packageJsonUrl, { main: null }, packageJsonUrl),
+-      { code: 'ERR_MODULE_NOT_FOUND' },
++      { code: 'ERR_INTERNAL_ASSERTION' },
+     );
+   });
+ 
+@@ -150,7 +150,7 @@ describe('legacyMainResolve', () => {
+     );
+     assert.throws(
+       () => legacyMainResolve(packageJsonUrl, { main: null }, undefined),
+-      { message: /"base" argument must be/, code: 'ERR_INVALID_ARG_TYPE' },
++      { message: 'The "path" argument must be of type string or an instance of URL. Received undefined', code: 'ERR_INVALID_ARG_TYPE' },
+     );
+   });
+ });
